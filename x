@@ -109,7 +109,7 @@ if [ "$API_PROVIDER" = "anthropic" ] && [ -z "${ANTHROPIC_MODEL:-}" ]; then
     ANTHROPIC_MODEL="claude-3-5-haiku-20241022"
 fi
 if [ "$API_PROVIDER" = "gemini" ] && [ -z "${GEMINI_MODEL:-}" ]; then
-    GEMINI_MODEL="gemini-2.0-flash-exp"
+    GEMINI_MODEL="gemini-2.5-flash"
 fi
 
 # Check if instruction is provided
@@ -141,6 +141,9 @@ PROMPT_TEXT="You are a shell command generator. Convert the user's natural langu
 
 [[ $DEBUG -eq 1 ]] && echo "DEBUG: Using API provider: $API_PROVIDER" >&2
 [[ $DEBUG -eq 1 ]] && echo "DEBUG: Instruction: $INSTRUCTION" >&2
+
+COMMAND=""
+RESPONSE=""
 
 # Make API request based on provider
 if [ "$API_PROVIDER" = "openai" ]; then
@@ -268,7 +271,7 @@ EOF
 
 elif [ "$API_PROVIDER" = "gemini" ]; then
     # Try models in order of preference (cheap to cheaper)
-    GEMINI_MODELS=("${GEMINI_MODEL}" "gemini-2.0-flash-exp" "gemini-1.5-flash" "gemini-pro")
+    GEMINI_MODELS=("${GEMINI_MODEL}" "gemini-2.5-flash" "gemini-2.5-flash-lite")
 
     for MODEL in "${GEMINI_MODELS[@]}"; do
         [[ $DEBUG -eq 1 ]] && echo "DEBUG: Trying Gemini model: $MODEL" >&2
@@ -386,7 +389,7 @@ fi
 
 # Display command and ask for confirmation
 echo "----------"
-echo -e "\033[1;33m>>>\033[0m $COMMAND"
+printf '\033[1;33m>>>\033[0m %s\n' "$COMMAND"
 read -p "Execute this command? (Y/n): " -n 1 -r
 echo
 
